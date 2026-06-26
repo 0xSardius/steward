@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build output
+.next/
+out/
+dist/
+build/
+target/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*-keypair.json
+**/keypairs/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+Thumbs.db
+
+# Test / coverage
+coverage/
+.nyc_output/
+
+# Solana / Anchor
+.anchor/
+test-ledger/
