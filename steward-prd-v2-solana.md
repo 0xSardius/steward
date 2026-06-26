@@ -34,7 +34,7 @@ The incumbent products solve only #1 (partially, at high fees). None solve #2–
 | # | Goal | Success metric |
 |---|------|----------------|
 | G1 | Run one real fundraising campaign end-to-end at St. Bernadette's | ≥ 1 completed campaign (second collection or school fundraiser) with ≥ 50 donors |
-| G2 | Beat incumbent all-in cost | Effective fee ≤ 1.5% on ACH gifts (vs ~2.9% incumbent card rails). **Note:** this is achieved by routing gifts through ACH-funded ramp deposits (Bridge virtual accounts) — the Solana on-chain leg is ~$0.001 and not a material cost driver either way. |
+| G2 | Beat incumbent all-in cost | Effective fee ≤ 1.5% on **ACH gifts** (vs ~2.9% incumbent card rails), achieved via ACH-funded Bridge virtual accounts (configurable near-zero exchange/gas fees). The Solana on-chain leg is ~$0.001 and immaterial. **Card gifts run hotter:** Stripe Crypto Onramp is ~1.5% + $0.30 flat, so the flat fee pushes small card gifts above target (a $0.30 fee on a $10 gift = 3%); card trends toward ~1.5% only on larger gifts. A true sub-1.5% all-in card path is impossible (interchange). Strategy: nudge donors to ACH (esp. recurring), offer card/Apple Pay as convenience. |
 | G3 | Prove the fund-accounting value prop | 100% of pilot donations auto-allocated to the correct designated fund, zero manual reconciliation |
 | G4 | Prove dual-control payouts | All outbound transfers in pilot require 2-of-N approval, **enforced on-chain by the Squads multisig** (not merely app-layer) |
 | G5 | Zero crypto exposure for end users | No donor or staff member needs to see a wallet address, gas, SOL, or token name to complete any core flow |
@@ -78,7 +78,7 @@ The incumbent products solve only #1 (partially, at high fees). None solve #2–
 
 **Giving**
 - Hosted giving page per organization with fund selector (e.g., Offertory, Building Fund, School Annual Fund)
-- One-time and recurring gifts; card and ACH funded via **Bridge** (virtual account / hosted onramp); settlement to the org's **USDC balance held in its Squads multisig vault on Solana**
+- One-time and recurring gifts via **two ramp rails**, both settling to the org's **USDC balance in its Squads multisig vault on Solana**: **(a) card / Apple Pay / Google Pay → Stripe Crypto Onramp**, and **(b) ACH / wire → Bridge virtual account**. (Bridge's own API is bank-rails-only and does not accept cards; card→Solana is a Stripe capability — see §10 and §16.) Nudge donors toward ACH for the best economics (see G2)
 - Apple Pay / Google Pay if supported by the ramp/hosted-checkout provider (large mobile conversion lift)
 - QR code generation for bulletins/pews; shareable campaign links (Solana Pay QR optional, but donor pays fiat — see §9 F1)
 - Instant email receipt to donor (Resend), 501(c)(3) compliant language
@@ -116,7 +116,7 @@ The incumbent products solve only #1 (partially, at high fees). None solve #2–
 
 ## 9. Core user flows (P0)
 
-**F1. Donor gives:** Scan QR / tap link → giving page → choose fund + amount + frequency → pay via card/ACH/Apple Pay (Bridge-hosted or embedded checkout) → Bridge converts fiat to USDC and delivers it to the org's **Squads vault on Solana**, tagged to the chosen fund in the ledger → donor receives email receipt. *Donor never sees crypto and never needs a wallet.*
+**F1. Donor gives:** Scan QR / tap link → giving page → choose fund + amount + frequency → pay via **card/Apple Pay (Stripe Crypto Onramp)** or **ACH/wire (Bridge virtual account)** → fiat converts to USDC delivered to the org's **Squads vault on Solana**, tagged to the chosen fund in the ledger → donor receives email receipt. *Donor never sees crypto and never needs a wallet.*
 
 **F2. Bookkeeper reconciles:** Dashboard shows gifts in USD by fund in near-real-time (Helius webhooks → idempotent queue → Postgres, deduped on transaction signature, credited at `finalized` commitment) → exports CSV to QuickBooks. No manual fund allocation.
 
@@ -133,7 +133,7 @@ The incumbent products solve only #1 (partially, at high fees). None solve #2–
 | Wallets (human signers) | **Privy embedded wallets (Solana)** | Email/OTP auth; non-custodial EOA-style keys; `useSignTransaction` / `useSessionSigner`. Each signer's pubkey is a Squads member. *Note: Privy's ERC-4337 smart wallets are EVM-only — on Solana, on-chain policy lives in Squads, not Privy.* Alternatives: Crossmint (only true Solana smart-contract wallets + card rails), Turnkey (backend/agent signing), Para (MPC, multichain) |
 | Fee sponsorship | **Native fee-payer + optional Kora relayer** | Set the tx fee payer to a sponsor key; both sponsor and user sign. Kora (Solana Foundation; successor to the now-archived Octane) adds allowlists/rate-limits and pay-in-SPL-token reimbursement, and supports Privy/Turnkey external signers. No paymaster/bundler, no EIP-7702. |
 | Onchain infra | **Helius** | RPC + webhooks (enhanced/parsed + raw) + Enhanced Transactions API for backfill + LaserStream gRPC. Keeps the Postgres ledger in sync with chain state. (QuickNode Streams / Alchemy Solana are alternatives.) Webhook deliveries can duplicate → consumers must be idempotent. |
-| Fiat ramps | **Bridge (a Stripe company)** | On-ramp (ACH/wire virtual accounts; card via Stripe hosted onramp) and off-ramp (liquidation address + payout API) — both support **Solana USDC** as settlement. Squads' production Bridge off-ramp is the reference. Bridge carries MSB licensing + KYC/KYB; received conditional OCC trust charter (Feb 2026). |
+| Fiat ramps | **Bridge + Stripe Crypto Onramp** (one parent co.) | **Two rails, both → USDC on Solana:** (a) **card / Apple Pay / Google Pay → Stripe Crypto Onramp** (USDC-Solana is a supported US asset; *not available in EU*; verify NY/state coverage in dashboard); (b) **ACH / wire → Bridge virtual account** — Bridge's API is **bank-rails-only, no card**. Off-ramp: Bridge liquidation address + payout API (Squads' production Bridge off-ramp is the reference). Bridge carries MSB licensing + KYC/KYB; conditional OCC trust charter (Feb 2026). |
 | Approvals | **2-of-N enforced at the Squads program level** | On-chain enforcement via proposal → vote → execute, not just app-layer. This is the audit-grade differentiator. |
 | Stablecoin | **USDC (native, Circle)** | `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`. Dominant Solana stablecoin (~half of ~$15B supply), primary DEX quote asset. (PYUSD / USDG exist natively but on Token-2022 and far less liquid — not for v1.) |
 | Email | **Resend** | Receipts, approval requests, statements |
@@ -207,7 +207,7 @@ The parish product generalizes to any small volunteer-run organization with a tr
 3. Pilot vehicle: school fundraiser vs. second collection? (Fundraiser = lower stakes, natural end date; collection = closer to core offertory.)
 4. Entity setup for the platform itself (LLC/C-corp) and who signs the Bridge platform agreement.
 5. Pricing model: flat SaaS fee, per-transaction spread, or free pilot → diocese-level licensing? (Recommend free pilot; decide pricing with real cost data.)
-6. **(Solana-specific)** Does Bridge's **card** on-ramp settle directly to Solana USDC, or only its bank-rail (ACH/wire) virtual accounts? (Affects mobile conversion and the Apple/Google Pay story.)
+6. ~~**(Solana-specific)** Does Bridge's **card** on-ramp settle directly to Solana USDC, or only its bank-rail (ACH/wire) virtual accounts?~~ **RESOLVED (Jun 2026):** Bridge's API is bank-rails-only (no card). Card / Apple Pay / Google Pay → Solana USDC is a **Stripe Crypto Onramp** capability, not Bridge's. Architecture uses both rails (§10). USDC-Solana unavailable in EU; verify NY/state coverage and exact fee tiers in the authenticated Stripe + Bridge dashboards before building.
 7. **(Solana-specific)** Fund accounting model: single Squads vault + off-chain fund tags (simplest), or one Squads vault index per designated fund for on-chain segregation? (Decide before the dashboard/ledger build in week 5.)
 8. **(Solana-specific)** Squads V4 vs the new v5 Smart Account Program / Grid — does the pilot need any v5-only feature, or is immutable V4 the right stable base? (Recommend V4 for the pilot.)
 
@@ -222,7 +222,7 @@ v1 targeted Base + Privy smart accounts + EIP-7702 + Alchemy. v2 targets Solana.
 | Org "smart account" + 2-of-N | EIP-7702 / smart account with role signers (custom-ish) | **Squads V4 multisig** | Squads is a mature, audited, immutable, $10B+ on-chain multisig; M-of-N is its core function, not bespoke contract work |
 | Per-human key / email auth | Privy embedded + smart wallet | **Privy embedded (Solana)** for signers; on-chain policy in Squads | Same email-auth UX; cleaner separation of identity (Privy) from treasury policy (Squads) |
 | Gas / no-visible-signing | EIP-7702 sponsorship + batched approvals + paymaster | **Native fee-payer** (+ optional **Kora** relayer) | One transaction field, not a bundler/paymaster stack; SOL is never user-visible |
-| Fiat ramp | Bridge | **Bridge (Solana)** | Same vendor; Solana is first-class; Squads+Bridge off-ramp is a live reference |
+| Fiat ramp | Bridge | **Bridge (ACH/wire) + Stripe Crypto Onramp (card)** | Same parent co.; Solana is first-class; Squads+Bridge off-ramp is a live reference. Bridge API is bank-rails-only — card→Solana is Stripe's onramp |
 | Indexing / ledger sync | Alchemy RPC + webhooks | **Helius** webhooks + DAS + backfill | Solana-native leader; same sync pattern (webhook → idempotent queue → Postgres) |
 | On-chain fee per gift/payout | cents | **~$0.0002–0.001** | Marginally cheaper; not the dominant cost (the ramp spread is) |
 | Stablecoin | USDC on Base | **USDC native on Solana** | Native Circle issuance; dominant liquidity |

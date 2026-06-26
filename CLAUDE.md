@@ -25,7 +25,7 @@ Do not substitute these without flagging it — they were chosen deliberately ov
 | Org treasury / "smart account" | **Squads V4** (`@sqds/multisig`) | The org account *is* a Squads multisig. 2-of-N is enforced **on-chain** via proposal → vote → execute — never reimplement approval as app-layer-only logic. Use V4, not the legacy `@sqds/sdk` (V3) |
 | Human signer keys / auth | **Privy** embedded wallets (Solana) | Email/OTP auth, non-custodial. Each human's Privy pubkey is a Squads member. Privy's smart wallets (AA) are EVM-only — **on-chain policy lives in Squads, not Privy** |
 | Fee sponsorship | Native fee-payer (+ optional **Kora** relayer) | Set the tx fee payer to a sponsor key. No paymaster/bundler, no EIP-7702. Users never hold SOL |
-| Fiat on/off-ramp | **Bridge** (Stripe co.) | On-ramp ACH/wire virtual accounts + card; off-ramp via liquidation address + payout API. Settles Solana USDC. Bridge is the licensed MSB — Steward is software, not a money transmitter |
+| Fiat on/off-ramp | **Bridge + Stripe Crypto Onramp** (one parent co.) | Two rails → Solana USDC: **card/Apple Pay/Google Pay = Stripe Crypto Onramp** (Bridge's API is bank-rails-only, no card); **ACH/wire = Bridge virtual account**. Off-ramp = Bridge liquidation address + payout API. Bridge is the licensed MSB — Steward is software, not a money transmitter. USDC-Solana unavailable in EU; verify NY/state + fee tiers in dashboards |
 | Indexing / ledger sync | **Helius** webhooks + Enhanced Transactions API | |
 | Stablecoin | **USDC** native (`EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`) | USDC-only in v1. Not PYUSD/USDG |
 | Email | Resend | Receipts, approval requests, statements |
