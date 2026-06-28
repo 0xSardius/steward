@@ -1,0 +1,25 @@
+{
+  "name": "@steward/solana",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "lint": "echo \"(no lint configured)\""
+  },
+  "dependencies": {
+    "@solana/kit": "^2.1.0",
+    "@sqds/multisig": "^2.1.3",
+    "@steward/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "typescript": "^5.7.3"
+  }
+}

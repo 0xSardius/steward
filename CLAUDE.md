@@ -4,7 +4,33 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Status
 
-**Pre-build.** This repository currently contains only product specs — no application code, build system, or git history yet. The source of truth is the PRD. When scaffolding begins, update this file with real build/test/lint commands.
+**Scaffolded (Phase 2).** pnpm monorepo is in place and `pnpm -r typecheck` is green. Core flows are stubbed at the integration points (Squads helpers, settlement processor, webhook signature verification). Source of truth for *intent* is the PRD; for *the four resolved choices*, `DECISIONS.md`; for *build state*, `.superstack/build-context.md`.
+
+### Commands
+
+```bash
+pnpm install
+pnpm dev            # apps/web — Next.js (giving pages + dashboard + API routes)
+pnpm dev:worker     # apps/worker — ledger-sync BullMQ consumer (needs Redis)
+pnpm typecheck      # tsc --noEmit across all packages (the green gate)
+pnpm build          # build all packages
+pnpm lint           # next lint (web)
+pnpm db:generate    # drizzle-kit: generate migrations from packages/db/src/schema.ts
+pnpm db:migrate     # apply migrations (needs DATABASE_URL / Postgres)
+pnpm db:studio      # drizzle studio
+```
+Run a single package's script with `pnpm --filter @steward/<name> <script>`. Copy `.env.example` → `apps/web/.env.local` and `apps/worker/.env`. `next build` isn't wired into verification because the webhook routes open Redis connections at import — run it locally with infra up.
+
+### Workspace layout
+
+```
+apps/web        Next.js — giving pages, dashboard, webhook + action API routes
+apps/worker     BullMQ consumer — applies webhook events to the Postgres mirror idempotently
+packages/core   Domain types + zod schemas + the shared ledger-queue contract (@steward/core)
+packages/db     Drizzle schema + client — the on-chain MIRROR (@steward/db)
+packages/solana Squads V4 helpers (stubs) + @solana/kit RPC (@steward/solana)
+```
+Apps may depend on packages, never on each other. Shared contracts (queue name, job types, domain types) live in `@steward/core`. `next.config.ts` lists workspace packages under `transpilePackages` since they ship raw TS.
 
 - **`steward-prd-v2-solana.md` — the authoritative spec.** Build against this.
 - **`DECISIONS.md` — ADR log** for the four decisions that were open after the PRD review (Squads V4-vs-v5, fund-accounting model, KYB/KYC posture, give-flow rail steering). Check it before implementing any of those areas.

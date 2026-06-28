@@ -31,6 +31,9 @@ yarn-error.log*
 !.vscode/extensions.json
 Thumbs.db
 
+# TypeScript build info
+*.tsbuildinfo
+
 # Test / coverage
 coverage/
 .nyc_output/

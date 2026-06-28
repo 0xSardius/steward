@@ -1,0 +1,29 @@
+{
+  "name": "steward",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Stablecoin-powered giving & treasury platform for parishes and small nonprofits (Solana)",
+  "packageManager": "pnpm@10.18.3",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @steward/web dev",
+    "dev:worker": "pnpm --filter @steward/worker dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "db:generate": "pnpm --filter @steward/db generate",
+    "db:migrate": "pnpm --filter @steward/db migrate",
+    "db:studio": "pnpm --filter @steward/db studio"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "ioredis": "5.11.1"
+    }
+  }
+}
