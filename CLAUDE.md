@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Pre-build.** This repository currently contains only product specs — no application code, build system, or git history yet. The source of truth is the PRD. When scaffolding begins, update this file with real build/test/lint commands.
 
 - **`steward-prd-v2-solana.md` — the authoritative spec.** Build against this.
+- **`DECISIONS.md` — ADR log** for the four decisions that were open after the PRD review (Squads V4-vs-v5, fund-accounting model, KYB/KYC posture, give-flow rail steering). Check it before implementing any of those areas.
 - `steward-prd-v1.md` — original Base/EVM draft, kept for reference only. Do **not** build against it; §16 of v2 explains the migration.
 
 ## What Steward is

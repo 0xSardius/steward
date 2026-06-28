@@ -208,8 +208,10 @@ The parish product generalizes to any small volunteer-run organization with a tr
 4. Entity setup for the platform itself (LLC/C-corp) and who signs the Bridge platform agreement.
 5. Pricing model: flat SaaS fee, per-transaction spread, or free pilot → diocese-level licensing? (Recommend free pilot; decide pricing with real cost data.)
 6. ~~**(Solana-specific)** Does Bridge's **card** on-ramp settle directly to Solana USDC, or only its bank-rail (ACH/wire) virtual accounts?~~ **RESOLVED (Jun 2026):** Bridge's API is bank-rails-only (no card). Card / Apple Pay / Google Pay → Solana USDC is a **Stripe Crypto Onramp** capability, not Bridge's. Architecture uses both rails (§10). USDC-Solana unavailable in EU; verify NY/state coverage and exact fee tiers in the authenticated Stripe + Bridge dashboards before building.
-7. **(Solana-specific)** Fund accounting model: single Squads vault + off-chain fund tags (simplest), or one Squads vault index per designated fund for on-chain segregation? (Decide before the dashboard/ledger build in week 5.)
-8. **(Solana-specific)** Squads V4 vs the new v5 Smart Account Program / Grid — does the pilot need any v5-only feature, or is immutable V4 the right stable base? (Recommend V4 for the pilot.)
+7. **(Solana-specific)** Fund accounting model: single Squads vault + off-chain fund tags (simplest), or one Squads vault index per designated fund for on-chain segregation? → see **`DECISIONS.md` ADR-0002** (proposed: single vault + tags now, design for per-fund vaults later; decide before week-5 dashboard).
+8. **(Solana-specific)** Squads V4 vs the new v5 Smart Account Program / Grid — does the pilot need any v5-only feature, or is immutable V4 the right stable base? → see **`DECISIONS.md` ADR-0001** (proposed: V4 for the pilot).
+
+> Give-flow rail steering (ACH-vs-card) and the KYB/KYC posture are recorded as **ADR-0004** and **ADR-0003** in `DECISIONS.md`.
 
 ## 16. Why Solana, and what changed from v1
 
